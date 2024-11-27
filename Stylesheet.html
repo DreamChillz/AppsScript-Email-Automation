@@ -1,0 +1,132 @@
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+    
+    body {
+      font-family: 'Lato', sans-serif;
+      color: #434343;
+      margin: 20px;
+      padding: 10px;
+    }
+    
+    h2 {
+      color: #434343;
+      border-bottom: 2px solid #e2e2e2;
+      padding-bottom: 10px;
+    }
+    
+    form {
+      background: #ffffff;
+      padding: 20px;
+      margin: 20px auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+    }
+    
+    /* Form Elements */
+    label {
+      display: block;
+      margin: 15px 0 5px;
+    }
+    
+    input[type="text"],
+    textarea,
+    select {
+      width: calc(100% - 22px);
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      margin-bottom: 20px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    
+    textarea {
+      resize: vertical;
+    }
+    
+    button {
+      background-color: #323232;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    button:hover {
+      background-color: #357ab8;
+    }
+    
+    button[disabled] {
+      background-color: #ddd;
+      cursor: not-allowed;
+    }
+    
+    /* Specific Elements */
+    #genEmail{
+      background-color: #323232;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      width:100%;
+    
+    }
+    #genEmail:hover {
+      background-color: #357ab8;
+    }
+    
+    
+    #templatePreview {
+      background: #f9f9f9;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      margin-bottom: 20px;
+    }
+    
+    #emailList div {
+      background: #f9f9f9;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    
+    #sendResults {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    hr {
+      border: none;
+      border-top: 1px solid #e2e2e2;
+      margin: 20px 0;
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 600px) {
+      form {
+        padding: 15px;
+      }
+    
+      input[type="text"],
+      textarea,
+      select {
+        width: calc(100% - 20px);
+      }
+    
+      button {
+        width: 100%;
+        padding: 12px;
+      }
+    }
+    </style>
+    

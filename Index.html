@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <?!= include('Stylesheet'); ?>
+
+  <script>
+function loadTemplates() {
+  google.script.run.withSuccessHandler(populateTemplates).getTemplates();
+}
+
+function populateTemplates(templates) {
+  const select = document.getElementById('templateSelect');
+  select.innerHTML = '';
+
+  const defaultOption = document.createElement('option');
+  defaultOption.text = 'Select template';
+  defaultOption.value = '';
+  defaultOption.disabled = true;
+  defaultOption.selected = true;
+  select.appendChild(defaultOption);
+
+  templates.forEach(template => {
+    const option = document.createElement('option');
+    option.value = template;
+    option.text = template;
+    select.appendChild(option);
+  });
+}
+
+function loadPlaceholders() {
+  const templateName = document.getElementById('templateSelect').value;
+  if (templateName) {
+    google.script.run.withSuccessHandler(populatePlaceholders).getTemplatePlaceholders(templateName);
+    google.script.run.withSuccessHandler(showTemplatePreview).getTemplateBody(templateName);
+  } else {
+    const placeholdersDiv = document.getElementById('placeholders');
+    placeholdersDiv.innerHTML = '';
+    document.getElementById('templatePreview').textContent = '';
+  }
+}
+
+function populatePlaceholders(placeholders) {
+  const placeholdersDiv = document.getElementById('placeholders');
+  placeholdersDiv.innerHTML = '';
+  placeholders.forEach(placeholder => {
+    const label = document.createElement('label');
+    label.textContent = placeholder + ':';
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.name = placeholder;
+    input.classList.add('placeholderInput');
+    placeholdersDiv.appendChild(label);
+    placeholdersDiv.appendChild(input);
+    placeholdersDiv.appendChild(document.createElement('br'));
+  });
+}
+
+function showTemplatePreview(body) {
+  document.getElementById('templatePreview').textContent = body;
+}
+
+function generateEmail() {
+  const templateName = document.getElementById('templateSelect').value;
+  const emails = document.getElementById('emailsInput').value.split(',').map(email => email.trim());
+  const placeholders = {};
+  document.querySelectorAll('.placeholderInput').forEach(input => {
+    placeholders[input.name] = input.value;
+  });
+
+  google.script.run.withSuccessHandler(handleGeneratedEmails).generateEmailForMultipleRecipients(templateName, emails, placeholders);
+}
+
+function handleGeneratedEmails(emailsData) {
+  const emailListDiv = document.getElementById('emailList');
+  emailListDiv.innerHTML = '';
+
+  emailsData.forEach(emailData => {
+    const emailItem = document.createElement('div');
+    if (emailData.error) {
+      emailItem.innerHTML = `<strong>To:</strong> ${emailData.email} <br> <strong>Error:</strong> ${emailData.error}`;
+    } else {
+      emailItem.innerHTML = `<strong>To:</strong> ${emailData.email} <br> <strong>Subject:</strong> ${emailData.subject} <br> <strong>Body:</strong> <pre>${emailData.body}</pre>`;
+      emailItem.setAttribute('data-email', emailData.email);
+      emailItem.setAttribute('data-subject', emailData.subject);
+      emailItem.setAttribute('data-body', emailData.body);
+    }
+    emailListDiv.appendChild(emailItem);
+  });
+
+  document.getElementById('sendEmailButton').style.display = 'block';
+}
+
+function sendEmails() {
+  const emailItems = document.querySelectorAll('#emailList > div');
+  const emails = [];
+
+  emailItems.forEach(item => {
+    const email = item.getAttribute('data-email');
+    const subject = item.getAttribute('data-subject');
+    const body = item.getAttribute('data-body');
+    emails.push({ email, subject, body });
+  });
+
+  google.script.run.withSuccessHandler(emailSent).sendEmails(emails);
+}
+
+function emailSent(results) {
+  let message = 'Email sending results:\n\n';
+  
+  results.forEach(result => {
+    message += `To: ${result.email} - Status: ${result.status}`;
+    if (result.error) {
+      message += ` (Error: ${result.error})`;
+    }
+    message += '\n';
+  });
+
+  alert(message);
+  document.getElementById('sendEmailButton').style.display = 'none';
+}
+
+
+function importEmails() {
+  google.script.run.withSuccessHandler(showImportedEmails).importEmailsFromSheet();
+}
+
+function showImportedEmails(emails) {
+  document.getElementById('emailsInput').value = emails.join(',');
+}
+
+window.onload = loadTemplates;
+
+
+  </script>
+</head>
+<body>
+  <h2>Select Email Template</h2>
+  <form onsubmit="generateEmail(); return false;">
+    <label for="templateSelect">Template:</label>
+    <select id="templateSelect" onchange="loadPlaceholders()"></select><br><br>
+
+    <h2>Template Preview</h2>
+    <pre id="templatePreview"></pre>
+    <hr>
+
+    <h2>Enter Recipient Emails</h2>
+    <label for="emailsInput">Emails (comma-separated):</label>
+    <textarea id="emailsInput" rows="3" placeholder="abc@gmail.com" title="Key in manually or import email from sheets" required></textarea>
+    <button type="button" onclick="importEmails()">Import Emails from Sheet</button>
+    <hr>
+
+    <h2>Enter Placeholders</h2>
+    <div id="placeholders"></div>
+
+    <input id="genEmail" type="submit" value="Generate Email">
+  </form>
+  <hr>
+
+  <h2>Email Preview</h2>
+  <div id="emailList"></div>
+
+  <button id="sendEmailButton" style="display:none;" onclick="sendEmails()">Send Emails</button>
+
+</body>
+</html>
